@@ -4,13 +4,14 @@
 **Thành viên:**
 | Tên | Vai trò | Email |
 |-----|---------|-------|
-| Ngô Gia Bảo | Supervisor & Synthesis Owner | bao.ngogia@gmail.com |
+| Ngô Gia Bảo | Supervisor & Synthesis Owner | bbaolongngau@gmail.com |
 | Trần Thị B | Worker Owner | b@gmail.com |
 | Lê Văn C | MCP Owner | c@gmail.com |
 | Phạm Thị D | Trace & Docs Owner | d@gmail.com |
 
 **Ngày nộp:** 2026-04-14  
-**Repo:** [N/A]
+**Repo:** https://github.com/dunglk85/VinAI_Lab_day09_nhom04_403.git
+
 
 ---
 
