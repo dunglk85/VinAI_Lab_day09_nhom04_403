@@ -1,0 +1,104 @@
+{
+  "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+  "route_reason": "default route",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "3.1 Điều kiện làm thêm:\nLàm thêm giờ phải được Line Manager phê duyệt trước bằng văn bản.\n3.2 Hệ số lương làm thêm:\n- Ngày thường: 150% lương giờ tiêu chuẩn.\n- Ngày cuối tuần: 200% lương giờ tiêu chuẩn.\n- Ngày lễ: 300% lương giờ tiêu chuẩn.\n=== Phần 4: Remote work policy ===\n4.1 Điều kiện remote:\n- Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần.\n- Team Lead phải phê duyệt lịch remote qua HR Portal.\n- Ngày onsite bắt buộc: Thứ 3 và Thứ 5 theo lịch team.",
+      "source": "hr_leave_policy.txt",
+      "score": 0.6009,
+      "metadata": {
+        "total_chunks": 5,
+        "source": "hr_leave_policy.txt",
+        "chunk_index": 3
+      }
+    },
+    {
+      "text": "Ngoại lệ không được hoàn tiền:\n- Sản phẩm thuộc danh mục hàng kỹ thuật số (license key, subscription).\n- Đơn hàng đã áp dụng mã giảm giá đặc biệt theo chương trình khuyến mãi Flash Sale.\n- Sản phẩm đã được kích hoạt hoặc đăng ký tài khoản.",
+      "source": "policy_refund_v4.txt",
+      "score": 0.5831,
+      "metadata": {
+        "source": "policy_refund_v4.txt",
+        "total_chunks": 5,
+        "chunk_index": 2
+      }
+    },
+    {
+      "text": "Q: Tôi bị mất kết nối VPN liên tục, phải làm gì?\nA: Kiểm tra kết nối Internet trước. Nếu vẫn lỗi, tạo ticket P3 với log file VPN đính kèm.\nQ: VPN có giới hạn số thiết bị không?\nA: Mỗi tài khoản được kết nối VPN trên tối đa 2 thiết bị cùng lúc.\n=== Section 3: Phần mềm và license ===\nQ: Tôi cần cài phần mềm mới, phải làm gì?\nA: Gửi yêu cầu qua Jira project IT-SOFTWARE. Line Manager phải phê duyệt trước khi IT cài đặt.",
+      "source": "it_helpdesk_faq.txt",
+      "score": 0.5787,
+      "metadata": {
+        "chunk_index": 2,
+        "source": "it_helpdesk_faq.txt",
+        "total_chunks": 6
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "it_helpdesk_faq.txt",
+    "hr_leave_policy.txt",
+    "policy_refund_v4.txt"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Nhân viên được làm remote tối đa 2 ngày mỗi tuần, sau khi hoàn thành probation period. Lịch remote phải được Team Lead phê duyệt qua HR Portal. Ngày onsite bắt buộc là Thứ 3 và Thứ 5 theo lịch team [1].",
+  "sources": [
+    "it_helpdesk_faq.txt",
+    "hr_leave_policy.txt",
+    "policy_refund_v4.txt"
+  ],
+  "confidence": 0.59,
+  "history": [
+    "[supervisor] received task: Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+    "[supervisor] route=retrieval_worker reason=default route",
+    "[retrieval_worker] retrieved 3 chunks from ['it_helpdesk_faq.txt', 'hr_leave_policy.txt', 'policy_refund_v4.txt']",
+    "[synthesis_worker] answer generated, confidence=0.59, sources=['it_helpdesk_faq.txt', 'hr_leave_policy.txt', 'policy_refund_v4.txt']",
+    "[graph] completed in 4813ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 4813,
+  "run_id": "run_20260414_111806",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+        "top_k": 3
+      },
+      "output": {
+        "chunks_count": 3,
+        "sources": [
+          "it_helpdesk_faq.txt",
+          "hr_leave_policy.txt",
+          "policy_refund_v4.txt"
+        ]
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+        "chunks_count": 3,
+        "has_policy": false
+      },
+      "output": {
+        "answer_length": 202,
+        "sources": [
+          "it_helpdesk_faq.txt",
+          "hr_leave_policy.txt",
+          "policy_refund_v4.txt"
+        ],
+        "confidence": 0.59
+      },
+      "error": null
+    }
+  ],
+  "question_id": "q05"
+}
