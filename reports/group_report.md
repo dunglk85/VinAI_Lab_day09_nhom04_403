@@ -1,113 +1,87 @@
-# Báo Cáo Nhóm — Lab Day 09: Multi-Agent Orchestration
+﻿# Báo Cáo Nhóm — Lab Day 09: Multi-Agent Orchestration
 
-**Tên nhóm:** AI in Action  
-**Thành viên:**
-| Tên | Vai trò | Email |
-|-----|---------|-------|
-| Ngô Gia Bảo | Supervisor & Synthesis Owner | bbaolongngau@gmail.com |
-| Trần Thị B | Worker Owner | b@gmail.com |
-| Lê Văn C | MCP Owner | c@gmail.com |
-| Phạm Thị D | Trace & Docs Owner | d@gmail.com |
-
+**Tên nhóm:** Nhóm 04  
+**Môn học:** AI in Action  
 **Ngày nộp:** 2026-04-14  
-**Repo:** https://github.com/dunglk85/VinAI_Lab_day09_nhom04_403.git
-
-
----
+**Repo:** `d:\ai_in_action\old\VinAI_Lab_day09_nhom04_403`
 
 ## 1. Kiến trúc nhóm đã xây dựng
 
-Hệ thống của chúng tôi sử dụng mô hình **Supervisor-Worker** với cấu trúc 3 Worker chính và 1 nút Human Review để xử lý các trường hợp rủi ro cao.
+Nhóm triển khai hệ thống hỏi đáp nội bộ theo kiến trúc **Supervisor - Worker**. `graph.py` đóng vai trò điều phối, nhận câu hỏi và quyết định route sang `retrieval_worker`, `policy_tool_worker`, hoặc nhánh `human_review` khi truy vấn có tín hiệu rủi ro. Sau khi worker chuyên trách xử lý, `synthesis_worker` tổng hợp câu trả lời cuối cùng, kèm nguồn và confidence.
 
-**Hệ thống tổng quan:**
-- 1 Supervisor (`graph.py`) chịu trách nhiệm phân loại intent.
-- 3 Workers: Retrieval (với ChromaDB), Policy Tool (với rule-based logic + MCP), và Synthesis (với Gemini LLM + fallback).
-- 1 nút Human Review kích hoạt khi hệ thống gặp mã lỗi không rõ (`ERR-`) hoặc các yêu cầu khẩn cấp không tự tin xử lý.
+Kiến trúc này phù hợp với bài toán lab vì câu hỏi không đồng nhất: có câu chỉ cần tra cứu tài liệu, có câu phải kiểm tra policy, và có câu cần phối hợp thêm MCP tool. Việc tách vai trò giúp hệ thống dễ quan sát hơn so với pipeline một khối của Day 08. Trong trace hiện có, toàn bộ luồng đều ghi lại `supervisor_route`, `route_reason`, `workers_called`, `mcp_tools_used`, `confidence`, `latency_ms` và lịch sử xử lý trong `history`, nên nhóm có thể lần ngược từng bước khi câu trả lời chưa đúng.
 
-**Routing logic cốt lõi:**
-Chúng tôi sử dụng **Keyword-based Routing kết hợp Risk Assessment**. Supervisor tìm kiếm các từ khóa đặc trưng (hoàn tiền, SLA, P1, access) để chọn worker. Ngoài ra, nó còn quét các tín hiệu rủi ro (emergency, 2am) để đặt cờ `risk_high`.
-
-**MCP tools đã tích hợp:**
-- `search_kb`: Tìm kiếm kiến thức bổ sung từ vector database.
-- `get_ticket_info`: Lấy thông tin ticket Jira (mock).
-- `check_access_permission`: Kiểm tra quyền truy cập dựa trên level và vai trò.
-
----
+Ba thành phần quan trọng nhất của hệ thống là:
+- `workers/retrieval.py`: lấy bằng chứng từ kho tài liệu.
+- `workers/policy_tool.py`: xử lý câu hỏi liên quan policy/access và gọi MCP.
+- `workers/synthesis.py`: tổng hợp đáp án cuối cùng từ dữ liệu đã được ground.
 
 ## 2. Quyết định kỹ thuật quan trọng nhất
 
-**Quyết định:** Tích hợp cơ chế **Rule-based Fallback cho Synthesis Worker**.
+Quyết định kỹ thuật quan trọng nhất của nhóm là **ghi trace theo từng lần chạy và chuẩn hóa phân tích trong `eval_trace.py`** thay vì chỉ xem kết quả trả lời cuối cùng. Với cách này, nhóm không phải đoán câu trả lời sai do route sai, do worker sai, hay do synthesis chưa bám đúng context.
 
-**Bối cảnh vấn đề:**
-Trong quá trình lab, chúng tôi gặp vấn đề với Quota API Gemini và mã lỗi 401 của OpenAI. Nếu không có LLM, hệ thống sẽ trả về lỗi, làm sụp đổ toàn bộ pipeline cho các câu hỏi đơn giản.
+Trong `eval_trace.py`, nhóm tách rõ ba việc:
+1. `run_test_questions()` để chạy toàn bộ bộ câu hỏi và lưu từng trace riêng.
+2. `analyze_traces()` để tính các chỉ số như routing distribution, average confidence, latency, MCP usage rate và HITL rate.
+3. `compare_single_vs_multi()` để tạo phần khung so sánh Day 08 và Day 09.
 
-**Các phương án đã cân nhắc:**
+Quyết định này tạo ra lợi ích thực tế rõ ràng. Từ `artifacts/eval_report.json`, repo hiện có 59 trace đã lưu, trong đó:
+- `retrieval_worker`: 30/59 trace.
+- `policy_tool_worker`: 29/59 trace.
+- `avg_confidence`: 0.552.
+- `avg_latency_ms`: 6636 ms.
+- `mcp_usage_rate`: 29/59 (49%).
+- `hitl_rate`: 3/59 (5%).
 
-| Phương án | Ưu điểm | Nhược điểm |
-|-----------|---------|-----------|
-| Chỉ dùng Gemini | Dễ code, trình bày đẹp | Dễ bị rate limit (429) làm hỏng demo |
-| Thêm Retry/Backoff | Giúp vượt qua lỗi tạm thời | Vẫn tốn thời gian chờ đợi |
-| **Rule-based Fallback** | Đảm bảo luôn trả lời đúng context | Trình bày không mượt bằng LLM |
+Nếu không có lớp trace này, nhóm rất khó chứng minh được routing hoạt động ra sao, tài liệu nào được dùng nhiều nhất, hoặc MCP được gọi ở những tình huống nào.
 
-**Phương án đã chọn và lý do:**
-Chúng tôi chọn kết hợp **Retry + Fallback**. Nếu LLM fail sau 3 lần thử, hệ thống sẽ gọi hàm `_fallback_synthesis` để trích xuất text trực tiếp từ context và định dạng thành bullet points có citation. Điều này đảm bảo tính ổn định tối đa cho hệ thống.
+## 3. Kết quả chạy và quan sát từ trace
 
-**Bằng chứng từ code:**
-```python
-def _call_llm(messages: list) -> str:
-    # ... try OpenAI, then Gemini with Retries ...
-    if errors:
-        print(f"  ⚠️  LLM errors: {errors}")
-    return _fallback_synthesis(messages)
-```
+Dựa trên các trace trong `artifacts/traces/`, nhóm quan sát được một số pattern ổn định:
 
----
+- Các câu tra cứu ngắn như `q01`, `q04`, `q05`, `q06`, `q08`, `q11`, `q14` chủ yếu đi vào `retrieval_worker` với `route_reason = "default route"`.
+- Các câu hỏi có tín hiệu policy như `q02`, `q03`, `q07`, `q10`, `q12`, `q13`, `q15` đi vào `policy_tool_worker` với `route_reason = "task contains policy/access keyword"`.
+- Truy vấn rủi ro hơn như `q15` có `route_reason = "task contains policy/access keyword | risk_high flagged"` và worker gọi thêm MCP để lấy dữ liệu ticket/access.
+- Trường hợp `q09` chứa mã lỗi `ERR-403-AUTH` thể hiện rõ cơ chế an toàn: trace ghi `unknown error code + risk_high → human review | human approved → retrieval`, tức hệ thống không bỏ qua bước kiểm soát trước khi tiếp tục trả lời.
 
-## 3. Kết quả grading questions
+Một trace tiêu biểu là `q15`, nơi hệ thống phải xử lý đồng thời quy trình P1 và cấp quyền tạm thời cho contractor. Trace này cho thấy:
+- route sang `policy_tool_worker`;
+- gọi 3 MCP tools: `search_kb`, `get_ticket_info`, `check_access_permission`;
+- chuyển sang `synthesis_worker`;
+- trả lời với confidence `0.66`;
+- dùng hai nguồn chính là `access_control_sop.txt` và `sla_p1_2026.txt`.
 
-**Tổng điểm raw ước tính:** 90 / 96 (Dựa trên 15 câu test_questions)
+Điều này chứng minh kiến trúc multi-agent phát huy tác dụng rõ nhất ở các câu hỏi multi-step hoặc cross-document.
 
-**Câu pipeline xử lý tốt nhất:**
-- ID: q02 — "Hoàn tiền Flash Sale". Reason: Policy Worker nhận diện chính xác ngoại lệ trong code và trích xuất đúng lý do không được hoàn.
+## 4. So sánh Day 08 và Day 09
 
-**Câu pipeline fail hoặc partial:**
-- ID: q08 — "Quy trình P1". Reason: Context quá dài khiến fallback synthesis trích xuất không đủ các bước chi tiết.
+Từ `artifacts/eval_report.json` và các tài liệu trong `docs/`, nhóm rút ra ba khác biệt lớn giữa Day 08 và Day 09:
 
-**Câu gq09 (multi-hop):** 
-Trace ghi nhận Supervisor gọi `policy_tool_worker`, sau đó worker này gọi MCP `check_access_permission` và kết hợp với dữ liệu từ `access_control_sop.txt` để trả lời.
+**Thứ nhất, khả năng debug tốt hơn rõ rệt.**  
+Ở Day 08, khi câu trả lời sai, rất khó biết lỗi nằm ở retrieval hay generation. Sang Day 09, chỉ cần mở trace là có thể biết route nào đã được chọn, worker nào đã chạy, MCP nào đã được gọi và confidence ra sao.
 
----
+**Thứ hai, độ trễ tăng lên.**  
+`avg_latency_ms` hiện tại của Day 09 là khoảng `6636 ms`, cao hơn đáng kể so với baseline single-agent mà nhóm dùng để thảo luận trong docs. Đây là trade-off dễ hiểu vì pipeline đã có thêm supervisor, tool call và logging.
 
-## 4. So sánh Day 08 vs Day 09
+**Thứ ba, hệ thống mở rộng tốt hơn.**  
+Thay vì nhồi thêm logic vào một prompt lớn, nhóm có thể thêm worker mới hoặc MCP tool mới mà không phải viết lại toàn bộ luồng.
 
-**Metric thay đổi rõ nhất:**
-- **Debug time:** Giảm từ 20 phút xuống còn 5 phút nhờ JSON trace rõ ràng.
-- **Latency:** Tăng từ 4s lên 6.7s do thêm lớp Supervisor và MCP overhead.
+Tóm lại, Day 09 không tối ưu cho các câu FAQ rất ngắn, nhưng phù hợp hơn nhiều cho các truy vấn cần định tuyến rõ, cần bằng chứng, hoặc cần khả năng audit sau khi chạy.
 
-**Điều nhóm bất ngờ nhất:**
-Khả năng "tự hiểu" của hệ thống khi mình tách biệt concern. Dù Supervisor chỉ là keyword-based, nhưng vì Task-Worker contract chặt chẽ nên kết quả cuối cùng rất grounded.
+## 5. Phân công và vai trò trong nhóm
 
-**Trường hợp multi-agent KHÔNG giúp ích:**
-Đối với các câu hỏi FAQ cực kỳ đơn giản (SLA là gì?), kiến trúc này làm chậm phản hồi mà không tăng độ chính xác so với Day 08.
+Nhóm phân vai theo đúng cấu trúc lab:
+- Supervisor Owner: phụ trách `graph.py`, state và routing.
+- Worker Owner: phụ trách các worker và contract.
+- MCP Owner: phụ trách `mcp_server.py` và tích hợp tool call.
+- Trace & Docs Owner: phụ trách `eval_trace.py`, các tài liệu trong `docs/` và hoàn thiện báo cáo.
 
----
+Trong đó, phần Trace & Docs Owner có nhiệm vụ kết nối toàn bộ sản phẩm kỹ thuật thành một bộ bàn giao có thể đọc, có thể chấm và có thể debug. Đây là vai trò không trực tiếp tạo answer, nhưng quyết định việc nhóm có chứng minh được hệ thống của mình hoạt động đúng hay không.
 
-## 5. Phân vùng và đánh giá nhóm
+## 6. Nếu có thêm thời gian
 
-**Phân công thực tế:**
-- Ngô Gia Bảo: Build Supervisor Routing & Synthesis Worker (Sprint 1-2).
-- Trần Thị B: Build Retrieval Worker & Indexing (Sprint 2).
-- Lê Văn C: MCP Server & Tool dispatching (Sprint 3).
-- Phạm Thị D: Trace evaluation & Documentation (Sprint 4).
+Nếu có thêm một ngày, nhóm sẽ ưu tiên hai việc:
+1. Làm sạch trace theo từng batch chạy để tránh trộn nhiều lần đánh giá vào cùng một thư mục `artifacts/traces/`.
+2. Hoàn thiện số liệu baseline Day 08 trong `compare_single_vs_multi()` để phần so sánh không còn các trường `TODO`.
 
-**Điều nhóm làm tốt:**
-Phối hợp contract interface sớm (yaml) nên khi ghép code rất ít lỗi.
-
-**Điều nhóm làm chưa tốt:**
-Quản lý API Key chưa tốt dẫn đến bị rate limit giữa chừng.
-
----
-
-## 6. Nếu có thêm 1 ngày, nhóm sẽ làm gì?
-
-Chúng tôi sẽ chuyển Supervisor sang dùng **LLM Routing** thay vì keyword để xử lý các câu hỏi lắt léo mang tính chất so sánh giữa các chính sách khác nhau.
+Hai việc này sẽ giúp báo cáo nhất quán hơn và làm cho kết luận kỹ thuật của nhóm thuyết phục hơn khi đối chiếu trực tiếp giữa single-agent và multi-agent.
