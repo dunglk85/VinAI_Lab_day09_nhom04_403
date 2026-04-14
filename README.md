@@ -334,6 +334,7 @@ Nếu pipeline trả lời sai, kiểm tra lần lượt:
 - MCP spec: https://modelcontextprotocol.io/docs
 - ChromaDB: https://docs.trychroma.com
 - OpenAI Function Calling: https://platform.openai.com/docs/guides/function-calling
+  
 #   V i n A I _ L a b _ d a y 0 9 _ n h o m 0 4 _ 4 0 3 
  
  
