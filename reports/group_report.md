@@ -1,9 +1,7 @@
 ﻿# Báo Cáo Nhóm — Lab Day 09: Multi-Agent Orchestration
-
 **Tên nhóm:** Nhóm 04  
 **Môn học:** AI in Action  
 **Ngày nộp:** 2026-04-14  
-**Repo:** `d:\ai_in_action\old\VinAI_Lab_day09_nhom04_403`
 
 ## 1. Kiến trúc nhóm đã xây dựng
 
@@ -85,3 +83,6 @@ Nếu có thêm một ngày, nhóm sẽ ưu tiên hai việc:
 2. Hoàn thiện số liệu baseline Day 08 trong `compare_single_vs_multi()` để phần so sánh không còn các trường `TODO`.
 
 Hai việc này sẽ giúp báo cáo nhất quán hơn và làm cho kết luận kỹ thuật của nhóm thuyết phục hơn khi đối chiếu trực tiếp giữa single-agent và multi-agent.
+M Routing** thay vì keyword để xử lý các câu hỏi lắt léo mang tính chất so sánh giữa các chính sách khác nhau.
+ Routing** thay vì keyword để xử lý các câu hỏi lắt léo mang tính chất so sánh giữa các chính sách khác nhau.
+M Routing** thay vì keyword để xử lý các câu hỏi lắt léo mang tính chất so sánh giữa các chính sách khác nhau.
