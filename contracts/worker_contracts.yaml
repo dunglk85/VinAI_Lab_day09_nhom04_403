@@ -97,7 +97,7 @@ retrieval_worker:
     - "Stateless: không đọc hoặc ghi state ngoài những gì được khai báo ở trên"
   actual_implementation:
     status: "done"
-    notes: "Implemented dense retrieval with ChromaDB and Sentence Transformers."
+    notes: "Improved with load_dotenv and better error handling."
 
 # ─────────────────────────────────────────────
 # Policy Tool Worker
@@ -167,7 +167,7 @@ policy_tool_worker:
     - "Không được tự bịa policy rules không có trong tài liệu"
   actual_implementation:
     status: "done"
-    notes: "Implemented rule-based check with MCP tool integration for access and ticket info."
+    notes: "Implemented LLM-based analysis and integrated MCP tools (search_kb, get_ticket_info, check_access_permission)."
 
 # ─────────────────────────────────────────────
 # Synthesis Worker
@@ -215,7 +215,7 @@ synthesis_worker:
     - "Không được dùng kiến thức ngoài context được cung cấp"
   actual_implementation:
     status: "done"
-    notes: "Implemented LLM synthesis with Gemini/OpenAI and a robust rule-based fallback."
+    notes: "Implemented with grounded LLM prompt and LLM-as-Judge confidence scoring."
 
 # ─────────────────────────────────────────────
 # MCP Server
@@ -271,4 +271,4 @@ mcp_server:
     - "Không được raise exception ra ngoài dispatch_tool()"
   actual_implementation:
     status: "done"
-    notes: "Mock MCP server implemented with 4 tools: search_kb, get_ticket_info, check_access_permission, create_ticket."
+    notes: "Implemented in-process MCP server with search_kb, get_ticket_info, check_access_permission, and create_ticket tools."

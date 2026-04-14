@@ -1,4 +1,4 @@
-﻿# Báo Cáo Nhóm — Lab Day 09: Multi-Agent Orchestration
+# Báo Cáo Nhóm — Lab Day 09: Multi-Agent Orchestration
 
 **Tên nhóm:** Nhóm 04  
 **Môn học:** AI in Action  
@@ -25,13 +25,13 @@ Trong `eval_trace.py`, nhóm tách rõ ba việc:
 2. `analyze_traces()` để tính các chỉ số như routing distribution, average confidence, latency, MCP usage rate và HITL rate.
 3. `compare_single_vs_multi()` để tạo phần khung so sánh Day 08 và Day 09.
 
-Quyết định này tạo ra lợi ích thực tế rõ ràng. Từ `artifacts/eval_report.json`, repo hiện có 59 trace đã lưu, trong đó:
-- `retrieval_worker`: 30/59 trace.
-- `policy_tool_worker`: 29/59 trace.
-- `avg_confidence`: 0.552.
-- `avg_latency_ms`: 6636 ms.
-- `mcp_usage_rate`: 29/59 (49%).
-- `hitl_rate`: 3/59 (5%).
+Quyết định này tạo ra lợi ích thực tế rõ ràng. Từ `artifacts/eval_report.json`, repo hiện có 119 trace đã lưu, trong đó:
+- `retrieval_worker`: 62/119 (52%)
+- `policy_tool_worker`: 57/119 (47%)
+- `avg_confidence`: 0.54
+- `avg_latency_ms`: 6558 ms
+- `mcp_usage_rate`: 53/119 (44%)
+- `hitl_rate`: 7/119 (5%)
 
 Nếu không có lớp trace này, nhóm rất khó chứng minh được routing hoạt động ra sao, tài liệu nào được dùng nhiều nhất, hoặc MCP được gọi ở những tình huống nào.
 

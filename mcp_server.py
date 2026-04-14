@@ -375,3 +375,4 @@ if __name__ == "__main__":
     print(f"  Error: {err.get('error')}")
 
     print("\n✅ MCP server test done.")
+    print("\nTODO Sprint 3: Implement HTTP server nếu muốn bonus +2.")
