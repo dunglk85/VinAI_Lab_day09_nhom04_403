@@ -1,11 +1,8 @@
 # Lab Day 09 — Multi-Agent Orchestration
 
-**Môn:** AI in Action (AICB-P1)
-
+**Môn:** AI in Action (AICB-P1)  
 **Chủ đề:** Supervisor-Worker Pattern · MCP · Trace & Observability  
-
 **Thời gian:** 4 giờ (4 sprints x 60 phút)  
-
 **Tiếp nối:** Day 08 — RAG Pipeline → Day 09 — Orchestration Layer
 
 ---
@@ -334,7 +331,3 @@ Nếu pipeline trả lời sai, kiểm tra lần lượt:
 - MCP spec: https://modelcontextprotocol.io/docs
 - ChromaDB: https://docs.trychroma.com
 - OpenAI Function Calling: https://platform.openai.com/docs/guides/function-calling
-  
-#   V i n A I _ L a b _ d a y 0 9 _ n h o m 0 4 _ 4 0 3 
- 
- 
